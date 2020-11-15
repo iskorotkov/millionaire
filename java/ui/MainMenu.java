@@ -25,7 +25,7 @@ public class MainMenu extends JDialog {
         setModal(true);
 
         var path = System.getenv("QUESTIONS_FILE");
-        var questions = new Questions(path);
+        var questions = Questions.fromFile(path);
         var game = new Game(questions);
         update(game);
 
@@ -54,33 +54,17 @@ public class MainMenu extends JDialog {
             update(game);
         });
 
-        answer1Btn.addActionListener(e -> {
-            if (!game.answer(0)) {
-                JOptionPane.showMessageDialog(this, "Неверный ответ!");
-            }
-            update(game);
-        });
+        answer1Btn.addActionListener(e -> selectAnswer(game, 0));
+        answer2Btn.addActionListener(e -> selectAnswer(game, 1));
+        answer3Btn.addActionListener(e -> selectAnswer(game, 2));
+        answer4Btn.addActionListener(e -> selectAnswer(game, 3));
+    }
 
-        answer2Btn.addActionListener(e -> {
-            if (!game.answer(1)) {
-                JOptionPane.showMessageDialog(this, "Неверный ответ!");
-            }
-            update(game);
-        });
-
-        answer3Btn.addActionListener(e -> {
-            if (!game.answer(2)) {
-                JOptionPane.showMessageDialog(this, "Неверный ответ!");
-            }
-            update(game);
-        });
-
-        answer4Btn.addActionListener(e -> {
-            if (!game.answer(3)) {
-                JOptionPane.showMessageDialog(this, "Неверный ответ!");
-            }
-            update(game);
-        });
+    private void selectAnswer(Game game, int i) {
+        if (!game.answer(i)) {
+            JOptionPane.showMessageDialog(this, "Неверный ответ!");
+        }
+        update(game);
     }
 
     private void update(Game game) {

@@ -53,21 +53,15 @@ class Game(private val questions: Questions) {
     fun getQuestion(): Question = state.currentQuestion!!
 
     fun getCurrentReward(): Int = when (state.gameStatus) {
-        GameStatus.Won -> rewardIfPlayerWon()
-        GameStatus.Lost -> rewardIfPlayerLost()
-        GameStatus.InProgress -> rewardIfGameContinues()
-    }
-
-    private fun rewardIfGameContinues() = when (state.passedQuestions) {
-        0 -> 0
-        else -> state.passedQuestions - 1
-    }
-
-    private fun rewardIfPlayerWon() = tiers - 1
-
-    private fun rewardIfPlayerLost() = when (state.passedQuestions >= selectedTier) {
-        true -> selectedTier
-        false -> 0
+        GameStatus.Won -> tiers - 1
+        GameStatus.Lost -> when (state.passedQuestions >= selectedTier) {
+            true -> selectedTier
+            false -> 0
+        }
+        GameStatus.InProgress -> when (state.passedQuestions) {
+            0 -> 0
+            else -> state.passedQuestions - 1
+        }
     }
 
     fun takeHallHelp() {
