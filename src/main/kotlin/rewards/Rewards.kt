@@ -1,7 +1,7 @@
 package rewards
 
-class Rewards {
-    val values = arrayOf(
+class Rewards(
+    var selectedTier: Int = 0, val values: Array<Int> = arrayOf(
         500,
         1_000,
         2_000,
@@ -17,5 +17,5 @@ class Rewards {
         800_000,
         1_500_000,
         3_000_000
-    );
-}
+    )
+)
