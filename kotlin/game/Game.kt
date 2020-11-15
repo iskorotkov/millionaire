@@ -103,7 +103,7 @@ class Game(private val questions: Questions) {
         lifelines.hasSecondChance = false
         lifelines.lifelinesLeft--
 
-        lifelines.isSecondChangeActivated = true;
+        lifelines.isSecondChangeActivated = true
     }
 
     fun takeQuestionSwap() {
