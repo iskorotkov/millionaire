@@ -86,12 +86,24 @@
                   </grid>
                 </constraints>
                 <properties>
+                  <autoscrolls value="false"/>
+                  <enabled value="false"/>
                   <model>
-                    <item value="1"/>
-                    <item value="2"/>
-                    <item value="3"/>
-                    <item value="4"/>
-                    <item value="5"/>
+                    <item value="3000000"/>
+                    <item value="1500000"/>
+                    <item value="800000"/>
+                    <item value="400000"/>
+                    <item value="200000"/>
+                    <item value="100000"/>
+                    <item value="50000"/>
+                    <item value="25000"/>
+                    <item value="15000"/>
+                    <item value="10000"/>
+                    <item value="5000"/>
+                    <item value="3000"/>
+                    <item value="2000"/>
+                    <item value="1000"/>
+                    <item value="500"/>
                   </model>
                 </properties>
               </component>
@@ -128,7 +140,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="23fab" class="javax.swing.JLabel">
+          <component id="23fab" class="javax.swing.JLabel" binding="questionTxt">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

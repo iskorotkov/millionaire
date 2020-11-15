@@ -1,12 +1,11 @@
 package game
 
-import answers.AnswerResult
-import rewards.Rewards
 import questions.Question
 import questions.Questions
 
 class Game(private val questions: Questions) {
-    private val rewards = Rewards()
+    private var selectedTier: Int = 0
+    private val tiers = 15
     private val lifelines = Lifelines()
     private val state: State
 
@@ -15,33 +14,43 @@ class Game(private val questions: Questions) {
         state = State(q)
     }
 
-    fun answer(index: Int): AnswerResult {
-        lifelines.isSecondChangeActivated = false
-        return if (state.currentQuestion.rightAnswer == index) {
+    fun answer(index: Int): Boolean {
+        val isCorrect = getQuestion().rightAnswer == index
+        if (isCorrect) {
             userAnsweredCorrectly()
         } else {
             userAnsweredIncorrectly()
         }
+
+        lifelines.isSecondChangeActivated = false
+        return isCorrect
     }
 
-    private fun userAnsweredIncorrectly(): AnswerResult {
-        return if (lifelines.isSecondChangeActivated) {
-            AnswerResult(false, GameStatus.InProgress, state.currentQuestion)
+    fun getGameStatus(): GameStatus = state.gameStatus
+
+    private fun userAnsweredIncorrectly() {
+        if (lifelines.isSecondChangeActivated) {
+            state.gameStatus = GameStatus.InProgress
         } else {
-            AnswerResult(false, GameStatus.Lost, null)
+            state.currentQuestion = null
+            state.gameStatus = GameStatus.Lost
         }
     }
 
-    private fun userAnsweredCorrectly(): AnswerResult {
+    private fun userAnsweredCorrectly() {
         state.passedQuestions++
-        return if (state.passedQuestions == rewards.values.size) {
-            AnswerResult(true, GameStatus.Won, null)
+
+        if (state.passedQuestions == tiers) {
+            state.currentQuestion = null
+            state.gameStatus = GameStatus.Won
         } else {
-            AnswerResult(true, GameStatus.InProgress, questions.getRandomOfDifficulty(state.passedQuestions))
+            state.currentQuestion = questions.getRandomOfDifficulty(state.passedQuestions)
+            state.gameStatus = GameStatus.InProgress
+
         }
     }
 
-    fun getQuestion(): Question = state.currentQuestion
+    fun getQuestion(): Question = state.currentQuestion!!
 
     fun getCurrentReward(): Int = when (state.gameStatus) {
         GameStatus.Won -> rewardIfPlayerWon()
@@ -51,13 +60,13 @@ class Game(private val questions: Questions) {
 
     private fun rewardIfGameContinues() = when (state.passedQuestions) {
         0 -> 0
-        else -> rewards.values[state.passedQuestions - 1]
+        else -> state.passedQuestions - 1
     }
 
-    private fun rewardIfPlayerWon() = rewards.values.last()
+    private fun rewardIfPlayerWon() = tiers - 1
 
-    private fun rewardIfPlayerLost() = when (state.passedQuestions >= rewards.selectedTier) {
-        true -> rewards.values[rewards.selectedTier]
+    private fun rewardIfPlayerLost() = when (state.passedQuestions >= selectedTier) {
+        true -> selectedTier
         false -> 0
     }
 
@@ -78,11 +87,11 @@ class Game(private val questions: Questions) {
         lifelines.hasFiftyFifty = false
         lifelines.lifelinesLeft--
 
-        state.currentQuestion.answers
+        getQuestion().answers
             .filter { it.isActive }
-            .filterIndexed { i, _ -> i != state.currentQuestion.rightAnswer }
+            .filterIndexed { i, _ -> i != getQuestion().rightAnswer }
             .shuffled()
-            .drop(2)
+            .drop(1)
             .forEach { it.isActive = false }
     }
 

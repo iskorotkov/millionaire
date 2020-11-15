@@ -5,10 +5,8 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
-class Questions(path: String) {
-    private val questions = ArrayList<Question>()
-
-    init {
+class Questions {
+    constructor(path: String) {
         try {
             val stream = FileInputStream(path)
             val reader = BufferedReader(InputStreamReader(stream))
@@ -18,9 +16,9 @@ class Questions(path: String) {
                 val values = line.split('\t')
 
                 val question = values[0]
-                val answers = values.subList(1, 5).map { answers.Answer(it, true) }
-                val rightAnswer = values[5].toInt()
-                val difficulty = values[6].toInt()
+                val answers = values.subList(1, 5).map { Answer(it, true) }.toTypedArray()
+                val rightAnswer = values[5].toInt() - 1
+                val difficulty = values[6].toInt() - 1
                 questions.add(Question(question, answers, rightAnswer, difficulty))
 
                 line = reader.readLine()
@@ -30,12 +28,14 @@ class Questions(path: String) {
             stream.close()
         } catch (e: IOException) {
             println("Произошла ошибка при чтении файла")
-            println(e)
+            throw e
         } catch (e: IndexOutOfBoundsException) {
             println("В строке недостаточно значений")
-            println(e)
+            throw e
         }
     }
+
+    private val questions: ArrayList<Question> = ArrayList()
 
     fun getRandomOfDifficulty(difficulty: Int): Question = questions.filter { it.difficulty == difficulty }.random()
 }

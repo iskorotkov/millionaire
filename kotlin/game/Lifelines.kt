@@ -3,9 +3,9 @@ package game
 class Lifelines(
     var lifelinesLeft: Int = 4,
     var isSecondChangeActivated: Boolean = false,
-    var hasHallHelp: Boolean = false,
-    var hasFiftyFifty: Boolean = false,
-    var hasCallFriend: Boolean = false,
-    var hasSecondChance: Boolean = false,
-    var hasQuestionSwap: Boolean = false,
+    var hasHallHelp: Boolean = true,
+    var hasFiftyFifty: Boolean = true,
+    var hasCallFriend: Boolean = true,
+    var hasSecondChance: Boolean = true,
+    var hasQuestionSwap: Boolean = true,
 )
