@@ -1,3 +1,5 @@
 package questions
 
-class Question(val text: String, val answers: List<String>, val rightAnswer: Int, val difficulty: Int);
+import answers.Answer
+
+class Question(val text: String, val answers: List<Answer>, val rightAnswer: Int, val difficulty: Int);

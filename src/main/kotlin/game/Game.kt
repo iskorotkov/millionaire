@@ -1,6 +1,6 @@
 package game
 
-import questions.AnswerResult as AnswerResult
+import answers.AnswerResult
 import rewards.Rewards
 import questions.Question
 import questions.Questions
@@ -15,16 +15,21 @@ class Game(private val questions: Questions) {
         state = State(q)
     }
 
-    fun answer(index: Int): AnswerResult = if (state.currentQuestion.rightAnswer == index) {
-        userAnsweredCorrectly()
-    } else {
-        userAnsweredIncorrectly()
+    fun answer(index: Int): AnswerResult {
+        lifelines.isSecondChangeActivated = false
+        return if (state.currentQuestion.rightAnswer == index) {
+            userAnsweredCorrectly()
+        } else {
+            userAnsweredIncorrectly()
+        }
     }
 
-    private fun userAnsweredIncorrectly() = if (lifelines.isSecondChangeActivated) {
-        AnswerResult(false, GameStatus.InProgress, state.currentQuestion)
-    } else {
-        AnswerResult(false, GameStatus.Lost, null)
+    private fun userAnsweredIncorrectly(): AnswerResult {
+        return if (lifelines.isSecondChangeActivated) {
+            AnswerResult(false, GameStatus.InProgress, state.currentQuestion)
+        } else {
+            AnswerResult(false, GameStatus.Lost, null)
+        }
     }
 
     private fun userAnsweredCorrectly(): AnswerResult {
@@ -72,6 +77,13 @@ class Game(private val questions: Questions) {
 
         lifelines.hasFiftyFifty = false
         lifelines.lifelinesLeft--
+
+        state.currentQuestion.answers
+            .filter { it.isActive }
+            .filterIndexed { i, _ -> i != state.currentQuestion.rightAnswer }
+            .shuffled()
+            .drop(2)
+            .forEach { it.isActive = false }
     }
 
     fun takeCallFriend() {
@@ -90,6 +102,8 @@ class Game(private val questions: Questions) {
 
         lifelines.hasSecondChance = false
         lifelines.lifelinesLeft--
+
+        lifelines.isSecondChangeActivated = true;
     }
 
     fun takeQuestionSwap() {
@@ -99,6 +113,8 @@ class Game(private val questions: Questions) {
 
         lifelines.hasQuestionSwap = false
         lifelines.lifelinesLeft--
+
+        state.currentQuestion = questions.getRandomOfDifficulty(state.passedQuestions)
     }
 
     fun hasHallHelp(): Boolean = lifelines.hasHallHelp && lifelines.lifelinesLeft > 0
