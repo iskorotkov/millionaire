@@ -18,7 +18,7 @@ class Questions(path: String) {
                 val values = line.split('\t')
 
                 val question = values[0]
-                val answers = values.subList(1, 5)
+                val answers = values.subList(1, 5).map { answers.Answer(it, true) }
                 val rightAnswer = values[5].toInt()
                 val difficulty = values[6].toInt()
                 questions.add(Question(question, answers, rightAnswer, difficulty))
