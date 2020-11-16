@@ -4,7 +4,7 @@ import game.Game;
 import game.GameStatus;
 import game.Rewards;
 import questions.Answer;
-import questions.Questions;
+import storage.FileLoader;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -29,7 +29,8 @@ public class MainMenu extends JDialog {
         setModal(true);
 
         var path = System.getenv("QUESTIONS_FILE");
-        var questions = Questions.fromFile(path);
+        var loader = new FileLoader();
+        var questions = loader.load(path);
 
         var rewards = new Integer[]{
                 500,
