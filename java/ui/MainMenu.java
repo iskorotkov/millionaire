@@ -4,7 +4,7 @@ import game.Game;
 import game.GameStatus;
 import game.Rewards;
 import questions.Answer;
-import storage.FileLoader;
+import storage.SQLiteLoader;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -28,8 +28,8 @@ public class MainMenu extends JDialog {
         setContentPane(contentPane);
         setModal(true);
 
-        var path = System.getenv("QUESTIONS_FILE");
-        var loader = new FileLoader();
+        var path = System.getenv("QUESTIONS_DB");
+        var loader = new SQLiteLoader();
         var questions = loader.load(path);
 
         var rewards = new Integer[]{
