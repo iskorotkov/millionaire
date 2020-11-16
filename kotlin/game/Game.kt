@@ -3,19 +3,14 @@ package game
 import questions.Question
 import questions.Questions
 
-class Game(private val questions: Questions) {
-    private var selectedTier: Int = 0
-    private val tiers = 15
+class Game(private val questions: Questions, private val rewards: Rewards) {
     private val lifelines = Lifelines()
-    private val state: State
-
-    init {
-        val q = questions.getRandomOfDifficulty(0)
-        state = State(q)
-    }
+    private val state: State = State(questions.getRandomOfDifficulty(0))
 
     fun answer(index: Int): Boolean {
+        getQuestion().answers[index].disable()
         val isCorrect = getQuestion().rightAnswer == index
+
         if (isCorrect) {
             userAnsweredCorrectly()
         } else {
@@ -40,28 +35,24 @@ class Game(private val questions: Questions) {
     private fun userAnsweredCorrectly() {
         state.passedQuestions++
 
-        if (state.passedQuestions == tiers) {
+        if (state.passedQuestions == rewards.length()) {
             state.currentQuestion = null
             state.gameStatus = GameStatus.Won
         } else {
             state.currentQuestion = questions.getRandomOfDifficulty(state.passedQuestions)
             state.gameStatus = GameStatus.InProgress
-
         }
     }
 
     fun getQuestion(): Question = state.currentQuestion!!
 
     fun getCurrentReward(): Int = when (state.gameStatus) {
-        GameStatus.Won -> tiers - 1
-        GameStatus.Lost -> when (state.passedQuestions >= selectedTier) {
-            true -> selectedTier
+        GameStatus.Won -> rewards.get(rewards.length() - 1)
+        GameStatus.Lost -> when (state.passedQuestions > rewards.getSelectedTier()) {
+            true -> rewards.get(rewards.getSelectedTier())
             false -> 0
         }
-        GameStatus.InProgress -> when (state.passedQuestions) {
-            0 -> 0
-            else -> state.passedQuestions - 1
-        }
+        GameStatus.InProgress -> rewards.get(state.passedQuestions)
     }
 
     fun takeHallHelp() {
@@ -82,11 +73,11 @@ class Game(private val questions: Questions) {
         lifelines.lifelinesLeft--
 
         getQuestion().answers
-            .filter { it.isActive }
+            .filter { it.isEnabled() }
             .filterIndexed { i, _ -> i != getQuestion().rightAnswer }
             .shuffled()
             .drop(1)
-            .forEach { it.isActive = false }
+            .forEach { it.disable() }
     }
 
     fun takeCallFriend() {

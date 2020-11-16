@@ -1,10 +1,14 @@
 package ui;
 
 import game.Game;
+import game.GameStatus;
+import game.Rewards;
 import questions.Answer;
 import questions.Questions;
 
 import javax.swing.*;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class MainMenu extends JDialog {
     private JPanel contentPane;
@@ -18,7 +22,7 @@ public class MainMenu extends JDialog {
     private JButton answer3Btn;
     private JButton answer4Btn;
     private JLabel questionTxt;
-    private JList<String> rewardsLst;
+    private JList<Integer> rewardsLst;
 
     public MainMenu() {
         setContentPane(contentPane);
@@ -26,7 +30,34 @@ public class MainMenu extends JDialog {
 
         var path = System.getenv("QUESTIONS_FILE");
         var questions = Questions.fromFile(path);
-        var game = new Game(questions);
+
+        var rewards = new Integer[]{
+                500,
+                1_000,
+                2_000,
+                3_000,
+                5_000,
+                10_000,
+                15_000,
+                25_000,
+                50_000,
+                100_000,
+                200_000,
+                400_000,
+                800_000,
+                1_500_000,
+                3_000_000
+        };
+
+        var rewardsList = Arrays.asList(rewards.clone());
+        Collections.reverse(rewardsList);
+
+        var model = new DefaultListModel<Integer>();
+        model.addAll(rewardsList);
+        rewardsLst.setModel(model);
+        var tier = rewards.length - 1 - selectTier(model);
+
+        var game = new Game(questions, new Rewards(tier, rewards));
         update(game);
 
         hallHelpBtn.addActionListener(e -> {
@@ -60,6 +91,13 @@ public class MainMenu extends JDialog {
         answer4Btn.addActionListener(e -> selectAnswer(game, 3));
     }
 
+    private int selectTier(ListModel<Integer> model) {
+        TierSelection dialog = new TierSelection(model);
+        dialog.pack();
+        dialog.setVisible(true);
+        return dialog.getSelectedTier();
+    }
+
     private void selectAnswer(Game game, int i) {
         if (!game.answer(i)) {
             JOptionPane.showMessageDialog(this, "Неверный ответ!");
@@ -68,27 +106,25 @@ public class MainMenu extends JDialog {
     }
 
     private void update(Game game) {
-        switch (game.getGameStatus()) {
-            case Won -> {
-                updateRewardsList(game);
-                disableButtons();
-                JOptionPane.showMessageDialog(this, "Вы выиграли!");
-            }
-            case Lost -> {
-                updateRewardsList(game);
-                disableButtons();
-                JOptionPane.showMessageDialog(this, "Вы проиграли!");
-            }
-            case InProgress -> {
-                updateRewardsList(game);
-                updateLifelinesButtons(game);
-                updateQuestion(game);
+        updateRewardsList(game);
+
+        if (game.getGameStatus() == GameStatus.InProgress) {
+            updateLifelinesButtons(game);
+            updateQuestion(game);
+        } else {
+            disableButtons();
+            var reward = game.getCurrentReward();
+
+            if (game.getGameStatus() == GameStatus.Won) {
+                JOptionPane.showMessageDialog(this, String.format("Вы выиграли! Ваш выигрыш составил %d рублей", reward));
+            } else {
+                JOptionPane.showMessageDialog(this, String.format("Вы проиграли! Ваш выигрыш составил %d рублей", reward));
             }
         }
     }
 
     private void updateRewardsList(Game game) {
-        rewardsLst.setSelectedIndex(rewardsLst.getModel().getSize() - 1 - game.getCurrentReward());
+        rewardsLst.setSelectedValue(game.getCurrentReward(), true);
     }
 
     private void updateQuestion(Game game) {
@@ -125,7 +161,7 @@ public class MainMenu extends JDialog {
 
     private void updateAnswerButton(JButton btn, Answer answer) {
         btn.setText(answer.getText());
-        btn.setEnabled(answer.isActive());
+        btn.setEnabled(answer.isEnabled());
     }
 
     public static void main(String[] args) {

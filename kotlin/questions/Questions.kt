@@ -40,7 +40,7 @@ class Questions(private val questions: ArrayList<Question>) {
             val values = line.split('\t')
 
             val question = values[0]
-            val answers = values.subList(1, 5).map { Answer(it, true) }.toTypedArray()
+            val answers = values.subList(1, 5).map { Answer(it) }.toTypedArray()
             val rightAnswer = values[5].toInt() - 1
             val difficulty = values[6].toInt() - 1
             return Question(question, answers, rightAnswer, difficulty)
