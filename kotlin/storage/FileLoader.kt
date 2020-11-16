@@ -41,9 +41,9 @@ class FileLoader : QuestionsLoader {
         val values = line.split('\t')
 
         val question = values[0]
-        val answers = values.subList(1, 5).map { Answer(it) }.toTypedArray()
         val rightAnswer = values[5].toInt() - 1
+        val answers = values.subList(1, 5).mapIndexed { i, text -> Answer(text, i == rightAnswer) }.toTypedArray()
         val difficulty = values[6].toInt() - 1
-        return Question(question, answers, rightAnswer, difficulty)
+        return Question(question, answers, difficulty)
     }
 }

@@ -8,17 +8,17 @@ class Game(private val questions: Questions, private val rewards: Rewards) {
     private val state: State = State(questions.getRandomOfDifficulty(0))
 
     fun answer(index: Int): Boolean {
-        getQuestion().answers[index].disable()
-        val isCorrect = getQuestion().rightAnswer == index
+        val selectedAnswer = getQuestion().answers[index]
+        selectedAnswer.disable()
 
-        if (isCorrect) {
+        if (selectedAnswer.isCorrect) {
             userAnsweredCorrectly()
         } else {
             userAnsweredIncorrectly()
         }
 
         lifelines.isSecondChangeActivated = false
-        return isCorrect
+        return selectedAnswer.isCorrect
     }
 
     fun getGameStatus(): GameStatus = state.gameStatus
@@ -73,8 +73,8 @@ class Game(private val questions: Questions, private val rewards: Rewards) {
         lifelines.lifelinesLeft--
 
         getQuestion().answers
-            .filter { it.isEnabled() }
-            .filterIndexed { i, _ -> i != getQuestion().rightAnswer }
+            .filter { it.isEnabled }
+            .filter { !it.isCorrect }
             .shuffled()
             .drop(1)
             .forEach { it.disable() }

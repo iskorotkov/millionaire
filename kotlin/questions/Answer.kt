@@ -1,13 +1,12 @@
 package questions
 
-class Answer(private var text: String) {
+class Answer(val text: String, val isCorrect: Boolean) {
     private var enabled: Boolean = true
-
-    fun getText() = text
 
     fun disable() {
         enabled = false
     }
 
-    fun isEnabled() = enabled
+    val isEnabled
+        get() = enabled
 }
