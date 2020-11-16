@@ -13,6 +13,7 @@ public class TierSelection extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         tiersLst.setModel(tiers);
+        tiersLst.setSelectedIndex(0);
 
         buttonOK.addActionListener(e -> dispose());
     }
